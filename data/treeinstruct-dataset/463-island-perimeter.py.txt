@@ -1,0 +1,77 @@
+463-island-perimeter.py
+problem: ---
+problem:
+
+You are given a map in form of a two-dimensional integer grid where 1 represents land and 0 represents water.
+Grid cells are connected horizontally/vertically (not diagonally). The grid is completely surrounded by water,
+and there is exactly one island (i.e., one or more connected land cells).
+The island doesn't have "lakes" (water inside that isn't connected to the water around the island).
+One cell is a square with side length 1. The grid is rectangular, width and height don't exceed 100.
+Determine the perimeter of the island.
+
+Example:
+Input:
+[[0,1,0,0],
+ [1,1,1,0],
+ [0,1,0,0],
+ [1,1,0,0]]
+Output: 16
+---
+
+-----------------------------------------------------------------------
+bug_fixes: ---
+bug_fixes:
+Replace `grid[j][i]` with `grid[i][j]` on line 6.
+Replace `2` with `4` on line 7.
+Add a colon to the end of line 10.
+---
+
+-----------------------------------------------------------------------
+bug_desc: ---
+bug_desc:
+On line 6, grid[j][i] is accessed. This is wrong as the code will be checking the wrong neighboring cells when trying to determine the perimeter of the island. Switch the order of indices to grid[i][j] to fix the mistake.
+On line 7, perimeter is incremented by 2, which is incorrect behavior. Each land cell (represented by 1) initially contributes 4 sides to the perimeter. With perimeter += 2, each land cell contributes only 2 sides to the perimeter, which is incorrect.
+On line 10, a colon is missing from the if-condition, causing it to not terminate. This is a syntactical bug that can be fixed by adding a colon at the end.
+---
+
+-----------------------------------------------------------------------
+line_no: ---
+line_no:
+6
+---
+
+-----------------------------------------------------------------------
+buggy_code: ---
+buggy_code:
+1. class Solution:
+2.     def islandPerimeter(self, grid: List[List[int]]) -> int:
+3.         perimeter = 0
+4.         for i in range(len(grid)):
+5.           for j in range(len(grid[0])):
+6.             if grid[j][i] == 1:
+7.               perimeter += 2
+8.               if i + 1 < len(grid) and grid[i+1][j] == 1:
+9.                 perimeter -= 2
+10.               if j + 1 < len(grid[0])  and grid[i][j+1] == 1
+11.                 perimeter -= 2
+12.         return perimeter
+---
+
+-----------------------------------------------------------------------
+correct_code: ---
+correct_code:
+1. class Solution:
+2.     def islandPerimeter(self, grid: List[List[int]]) -> int:
+3.         perimeter = 0
+4.         for i in range(len(grid)):
+5.           for j in range(len(grid[0])):
+6.             if grid[i][j] == 1:
+7.               perimeter += 4
+8.               if i + 1 < len(grid) and grid[i+1][j] == 1:
+9.                 perimeter -= 2
+10.               if j + 1 < len(grid[0])  and grid[i][j+1] == 1:
+11.                 perimeter -= 2
+12.         return perimeter
+---
+
+-----------------------------------------------------------------------

@@ -1,0 +1,82 @@
+45-jump-game-ii.py
+problem: ---
+problem:
+
+Given an array of non-negative integers nums, you are initially positioned
+at the first index of the array.
+Each element in the array represents your maximum jump length at that position.
+Your goal is to reach the last index in the minimum number of jumps.
+You can assume that you can always reach the last index.
+
+Example 1:
+
+Input: nums = [2,3,1,1,4]
+Output: 2
+Explanation: The minimum number of jumps to reach the last index is 2.
+Jump 1 step from index 0 to 1, then 3 steps to the last index.
+
+Example 2:
+Input: nums = [2,3,0,1,4]
+Output: 2
+
+Constraints:
+1 <= nums.length <= 104
+0 <= nums[i] <= 1000
+---
+
+-----------------------------------------------------------------------
+bug_fixes: ---
+bug_fixes:
+Add a colon at the end of line 2.
+Replace `range(len(nums))` with`range(len(nums)-1)` on line 5.
+---
+
+-----------------------------------------------------------------------
+bug_desc: ---
+bug_desc:
+On line 2, a colon is missing from the method signature, causing it to not terminate. This is a syntactical bug that can be fixed by adding a colon at the end.
+On line 5, the for-loop ends with index at len(nums)-1. This results in a jump that is out of bounds. This is incorrect behavior and can be fixed by constraining the range to len(nums)-1.
+---
+
+-----------------------------------------------------------------------
+line_no: ---
+line_no:
+2
+---
+
+-----------------------------------------------------------------------
+buggy_code: ---
+buggy_code:
+1. class Solution:
+2.     def jump(self, nums: List[int]) -> int
+3.         jumps, end, farthest = 0, 0, 0
+4.
+5.         for index in range(len(nums)):
+6.             farthest = max(farthest, index + nums[index])
+7.
+8.             if end == index:
+9.                 jumps += 1
+10.                 end = farthest
+11.
+12.         return jumps
+---
+
+-----------------------------------------------------------------------
+correct_code: ---
+correct_code:
+1. class Solution:
+2.     def jump(self, nums: List[int]) -> int:
+3.         jumps, end, farthest = 0, 0, 0
+4.
+5.         for index in range(len(nums)-1):
+6.             farthest = max(farthest, index + nums[index])
+7.
+8.             if end == index:
+9.                 jumps += 1
+10.                 end = farthest
+11.
+12.         return jumps
+13.
+---
+
+-----------------------------------------------------------------------
