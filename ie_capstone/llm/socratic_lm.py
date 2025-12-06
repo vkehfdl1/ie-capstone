@@ -1,5 +1,6 @@
 """Socratic Learning Model chatbot for debugging assistance."""
 
+from collections.abc import Iterator
 from datetime import datetime
 
 from ie_capstone.llm.client import ClaudeClient
@@ -73,6 +74,48 @@ class SocraticLM:
         self.conversation_history.append(Message(role="assistant", content=response, timestamp=datetime.now()))
 
         return response
+
+    def stream_response(self, user_message: str, current_code: str | None = None) -> Iterator[str]:
+        """
+        Stream Socratic response to user's message.
+
+        Args:
+            user_message: Student's message
+            current_code: Current code in the editor (optional)
+
+        Yields:
+            Text chunks as they arrive
+        """
+        # Format message with current code if provided
+        if current_code is not None:
+            formatted_message = f"""[학생의 현재 코드]
+```python
+{current_code}
+```
+
+[학생의 메시지]
+{user_message}"""
+        else:
+            formatted_message = user_message
+
+        # Add user message to history
+        self.conversation_history.append(Message(role="user", content=formatted_message, timestamp=datetime.now()))
+
+        # Convert to API format
+        api_messages = self._get_conversation_for_api()
+
+        # Stream response from Claude and collect full response
+        full_response = ""
+        for chunk in self.client.stream_message(
+            messages=api_messages,
+            system_prompt=self.system_prompt,
+            temperature=0.7,
+        ):
+            full_response += chunk
+            yield chunk
+
+        # Add complete assistant response to history
+        self.conversation_history.append(Message(role="assistant", content=full_response, timestamp=datetime.now()))
 
     def get_initial_greeting(self) -> str:
         """

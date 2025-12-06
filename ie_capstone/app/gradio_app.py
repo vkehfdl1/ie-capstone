@@ -156,9 +156,10 @@ def create_app() -> gr.Blocks:
             )
 
         def handle_chat_submit(user_message: str, current_code: str, chat_history: list, state: dict):
-            """Handle user message submission in chat."""
+            """Handle user message submission in chat with streaming."""
             if not user_message.strip():
-                return chat_history, state, ""
+                yield chat_history, state, ""
+                return
 
             session = state["session"]
             socratic_lm = state["socratic_lm"]
@@ -169,23 +170,27 @@ def create_app() -> gr.Blocks:
             log_content = f"[현재 코드]\n```python\n{current_code}\n```\n\n[메시지]\n{user_message}"
             logger.log_message(session, problem_id, "user", log_content)
 
-            # Get response (pass current code to AI)
-            response = socratic_lm.get_response(user_message, current_code)
-
-            # Log assistant response
-            logger.log_message(session, problem_id, "assistant", response)
-
-            # Update chat history
+            # Add user message to chat history immediately
             chat_history = [
                 *chat_history,
                 {"role": "user", "content": user_message},
-                {"role": "assistant", "content": response},
+                {"role": "assistant", "content": ""},
             ]
+
+            # Stream response (pass current code to AI)
+            full_response = ""
+            for chunk in socratic_lm.stream_response(user_message, current_code):
+                full_response += chunk
+                chat_history[-1]["content"] = full_response
+                yield chat_history, state, ""
+
+            # Log assistant response after streaming completes
+            logger.log_message(session, problem_id, "assistant", full_response)
 
             # Save session after each message
             logger.save_session(session)
 
-            return chat_history, state, ""
+            yield chat_history, state, ""
 
         def handle_code_submit(code: str, chat_history: list, state: dict):
             """Handle final code submission for current problem."""

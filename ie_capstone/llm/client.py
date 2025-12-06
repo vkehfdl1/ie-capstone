@@ -1,5 +1,8 @@
 """Claude API client wrapper."""
 
+from collections.abc import Iterator
+from typing import Any
+
 import anthropic
 
 from ie_capstone.config import CLAUDE_MODEL, MAX_TOKENS
@@ -20,7 +23,7 @@ class ClaudeClient:
 
     def send_message(
         self,
-        messages: list[dict],
+        messages: Any,
         system_prompt: str,
         temperature: float = 0.7,
         max_tokens: int = MAX_TOKENS,
@@ -67,3 +70,31 @@ class ClaudeClient:
         """
         messages = [{"role": "user", "content": user_message}]
         return self.send_message(messages, system_prompt, temperature, max_tokens)
+
+    def stream_message(
+        self,
+        messages: Any,
+        system_prompt: str,
+        temperature: float = 0.7,
+        max_tokens: int = MAX_TOKENS,
+    ) -> Iterator[str]:
+        """
+        Stream messages from Claude, yielding text chunks.
+
+        Args:
+            messages: List of {"role": "user"|"assistant", "content": str}
+            system_prompt: System prompt for the conversation
+            temperature: Sampling temperature
+            max_tokens: Maximum tokens in response
+
+        Yields:
+            Text chunks as they arrive
+        """
+        with self.client.messages.stream(
+            model=self.model,
+            max_tokens=max_tokens,
+            system=system_prompt,
+            messages=messages,
+            temperature=temperature,
+        ) as stream:
+            yield from stream.text_stream
