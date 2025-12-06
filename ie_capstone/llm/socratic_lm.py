@@ -33,18 +33,31 @@ class SocraticLM:
         self.system_prompt = get_socratic_prompt(persona, problem)
         self.conversation_history: list[Message] = []
 
-    def get_response(self, user_message: str) -> str:
+    def get_response(self, user_message: str, current_code: str | None = None) -> str:
         """
         Get Socratic response to user's message.
 
         Args:
             user_message: Student's message
+            current_code: Current code in the editor (optional)
 
         Returns:
             Assistant's Socratic response
         """
-        # Add user message to history
-        self.conversation_history.append(Message(role="user", content=user_message, timestamp=datetime.now()))
+        # Format message with current code if provided
+        if current_code is not None:
+            formatted_message = f"""[학생의 현재 코드]
+```python
+{current_code}
+```
+
+[학생의 메시지]
+{user_message}"""
+        else:
+            formatted_message = user_message
+
+        # Add user message to history (store formatted version)
+        self.conversation_history.append(Message(role="user", content=formatted_message, timestamp=datetime.now()))
 
         # Convert to API format
         api_messages = self._get_conversation_for_api()
@@ -70,7 +83,7 @@ class SocraticLM:
         """
         if self.persona == "neutral":
             greeting = (
-                "코드에서 발생한 문제에 대해 설명해 주시기 바랍니다. 코드를 실행했을 때 어떤 동작이 관찰되었습니까?"
+                "안녕하십니까. 당신을 도와드릴 AI 튜터입니다. 다음 제시된 Python 코드의 오류를 밝혀내시길 바랍니다."
             )
         else:
             greeting = (

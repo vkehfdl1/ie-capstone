@@ -155,7 +155,7 @@ def create_app() -> gr.Blocks:
                 gr.update(visible=False),
             )
 
-        def handle_chat_submit(user_message: str, chat_history: list, state: dict):
+        def handle_chat_submit(user_message: str, current_code: str, chat_history: list, state: dict):
             """Handle user message submission in chat."""
             if not user_message.strip():
                 return chat_history, state, ""
@@ -165,11 +165,12 @@ def create_app() -> gr.Blocks:
             current_idx = state["current_problem_idx"]
             problem_id = current_idx + 1
 
-            # Log user message
-            logger.log_message(session, problem_id, "user", user_message)
+            # Log user message with current code context
+            log_content = f"[현재 코드]\n```python\n{current_code}\n```\n\n[메시지]\n{user_message}"
+            logger.log_message(session, problem_id, "user", log_content)
 
-            # Get response
-            response = socratic_lm.get_response(user_message)
+            # Get response (pass current code to AI)
+            response = socratic_lm.get_response(user_message, current_code)
 
             # Log assistant response
             logger.log_message(session, problem_id, "assistant", response)
@@ -306,13 +307,13 @@ def create_app() -> gr.Blocks:
         # Chat submission
         send_btn.click(
             handle_chat_submit,
-            inputs=[msg_input, chatbot, state],
+            inputs=[msg_input, code_editor, chatbot, state],
             outputs=[chatbot, state, msg_input],
         )
 
         msg_input.submit(
             handle_chat_submit,
-            inputs=[msg_input, chatbot, state],
+            inputs=[msg_input, code_editor, chatbot, state],
             outputs=[chatbot, state, msg_input],
         )
 
