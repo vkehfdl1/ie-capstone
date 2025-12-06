@@ -1,7 +1,7 @@
 <problem>
-Write a function `my_func(len: int) -> List[int]` that generates a list of `len` integers. The element at each position 'i' in the list should be computed as `i * 6 + rand.randint(1, len)`. Before calling the function, use 42 as the seed for the random number generator by calling `rand.seed(42)`. Assume that `len` is a non-negative integer.
+`my_func(len: int) -> List[int]` 함수를 작성하세요. 이 함수는 `len`개의 정수로 이루어진 리스트를 생성합니다. 리스트의 각 위치 'i'에 있는 요소는 `i * 6 + rand.randint(1, len)`으로 계산됩니다. 함수를 호출하기 전에, `rand.seed(42)`를 호출하여 난수 생성기의 시드를 42로 설정하세요. `len`은 음이 아닌 정수라고 가정합니다.
 
-## Example Cases:
+## 예시:
 ```
 my_func(10) => [2, 7, 17, 22, 28, 33, 38, 51, 50, 64]
 my_func(7) => [4, 7, 13, 19, 26, 32, 41]

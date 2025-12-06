@@ -25,6 +25,27 @@ def extract_tag_content(text: str, tag_name: str) -> str:
     return ""
 
 
+def strip_line_numbers(code: str) -> str:
+    """
+    Strip line numbers from code (e.g., "1. def foo():" -> "def foo():").
+
+    The dataset has line numbers in format "N. " at the start of each line.
+
+    Args:
+        code: Code with line numbers
+
+    Returns:
+        Code without line numbers
+    """
+    lines = code.split("\n")
+    stripped_lines = []
+    for line in lines:
+        # Match pattern like "1. ", "2. ", "10. " at start of line
+        stripped = re.sub(r"^\d+\.\s?", "", line)
+        stripped_lines.append(stripped)
+    return "\n".join(stripped_lines)
+
+
 def parse_bug_fixes(bug_fixes_content: str) -> list[str]:
     """
     Parse bug fixes content into list of individual fixes.
@@ -107,7 +128,8 @@ def parse_problem_file(file_path: Path) -> Problem:
 
     # Extract all tagged content
     description = extract_tag_content(text, "problem")
-    buggy_code = extract_tag_content(text, "bug_code")
+    buggy_code_raw = extract_tag_content(text, "bug_code")
+    buggy_code = strip_line_numbers(buggy_code_raw)
     bug_description = extract_tag_content(text, "bug_desc")
     bug_fixes_raw = extract_tag_content(text, "bug_fixes")
     unit_tests_raw = extract_tag_content(text, "unit_tests")

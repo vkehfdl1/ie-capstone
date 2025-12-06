@@ -70,13 +70,11 @@ class SocraticLM:
         """
         if self.persona == "neutral":
             greeting = (
-                "The student may begin by describing the issue encountered with the code. "
-                "What behavior has been observed when running the code?"
+                "코드에서 발생한 문제에 대해 설명해 주시기 바랍니다. 코드를 실행했을 때 어떤 동작이 관찰되었습니까?"
             )
         else:
             greeting = (
-                "Hey there! I'm excited to help you debug this code! "
-                "What's going on? Tell me about the problem you're running into. "
+                "안녕하세요! 코드 디버깅을 도와드리게 되어 기뻐요! 😊 무슨 문제가 있나요? 어떤 상황인지 알려주세요!"
             )
 
         # Add greeting to conversation history

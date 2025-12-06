@@ -47,34 +47,34 @@ def create_app() -> gr.Blocks:
     logger = SessionLogger()
 
     with gr.Blocks(
-        title="IE Capstone Experiment - Python Debugging",
+        title="IE Capstone 실험 - Python 디버깅",
     ) as app:
         # State variables
         state = gr.State({})
 
         # Header
-        gr.Markdown("# Python Debugging Experiment")
+        gr.Markdown("# Python 디버깅 실험")
 
         # Progress indicator
-        progress_text = gr.Markdown("**Progress: Problem 1 / 6**")
+        progress_text = gr.Markdown("**진행 상황: 문제 1 / 6**")
 
         with gr.Row():
             # Left column: Problem and Code
             with gr.Column(scale=1):
                 problem_display = gr.Markdown(
-                    label="Problem Description",
-                    value="Loading problem...",
+                    label="문제 설명",
+                    value="문제를 불러오는 중...",
                 )
 
                 code_editor = gr.Code(
-                    label="Your Code (Edit to fix the bug)",
+                    label="코드 (버그를 수정하세요)",
                     language="python",
                     lines=15,
                     interactive=True,
                 )
 
                 submit_btn = gr.Button(
-                    "Submit Final Answer",
+                    "최종 답안 제출",
                     variant="primary",
                     size="lg",
                 )
@@ -82,26 +82,26 @@ def create_app() -> gr.Blocks:
             # Right column: Chat
             with gr.Column(scale=1):
                 chatbot = gr.Chatbot(
-                    label="Socratic Tutor",
+                    label="AI 튜터",
                     height=400,
                 )
 
                 with gr.Row():
                     msg_input = gr.Textbox(
-                        label="Your message",
-                        placeholder="Ask a question about the bug...",
+                        label="메시지 입력",
+                        placeholder="버그에 대해 질문하세요...",
                         lines=2,
                         scale=4,
                     )
-                    send_btn = gr.Button("Send", variant="secondary", scale=1)
+                    send_btn = gr.Button("전송", variant="secondary", scale=1)
 
         # Results section (hidden initially)
         results_section = gr.Column(visible=False)
         with results_section:
             gr.Markdown("---")
-            gr.Markdown("## Experiment Complete!")
-            results_display = gr.Markdown("Results will appear here...")
-            gr.Markdown(f"**Please complete the survey:** [Click here to open the survey]({GOOGLE_FORM_URL})")
+            gr.Markdown("## 실험 완료!")
+            results_display = gr.Markdown("결과가 여기에 표시됩니다...")
+            gr.Markdown(f"**설문조사를 완료해주세요:** [설문조사 링크]({GOOGLE_FORM_URL})")
 
         # Feedback after submission
         feedback_display = gr.Markdown("")
@@ -135,11 +135,11 @@ def create_app() -> gr.Blocks:
 
             # Format problem display
             problem = problems[0]
-            problem_md = f"""### Problem 1
+            problem_md = f"""### 문제 1
 
 {problem.description}
 
-**Your task:** Find and fix the bug in the code below.
+**과제:** 아래 코드에서 버그를 찾아 수정하세요.
 """
 
             # Initial chat with greeting
@@ -147,7 +147,7 @@ def create_app() -> gr.Blocks:
 
             return (
                 new_state,
-                f"**Progress: Problem 1 / {TOTAL_PROBLEMS}**",
+                f"**진행 상황: 문제 1 / {TOTAL_PROBLEMS}**",
                 problem_md,
                 problem.buggy_code,
                 chat_history,
@@ -206,9 +206,9 @@ def create_app() -> gr.Blocks:
 
             # Prepare feedback
             if is_correct:
-                feedback = f"### Problem {problem_id} Complete!\n\nYour fix was evaluated as **CORRECT**."
+                feedback = f"### 문제 {problem_id} 완료!\n\n제출한 코드가 **정답**으로 평가되었습니다."
             else:
-                feedback = f"### Problem {problem_id} Complete!\n\nYour fix was evaluated as **INCORRECT**."
+                feedback = f"### 문제 {problem_id} 완료!\n\n제출한 코드가 **오답**으로 평가되었습니다."
 
             # Check if this was the last problem
             if current_idx >= TOTAL_PROBLEMS - 1:
@@ -223,7 +223,7 @@ def create_app() -> gr.Blocks:
                     feedback,
                     gr.update(visible=True),
                     results_md,
-                    "**Progress: Complete!**",
+                    "**진행 상황: 완료!**",
                     gr.update(interactive=False),
                     gr.update(interactive=False),
                     gr.update(interactive=False),
@@ -247,19 +247,19 @@ def create_app() -> gr.Blocks:
             new_chat = [{"role": "assistant", "content": new_greeting}]
 
             # Format new problem
-            problem_md = f"""### Problem {next_idx + 1}
+            problem_md = f"""### 문제 {next_idx + 1}
 
 {next_problem.description}
 
-**Your task:** Find and fix the bug in the code below.
+**과제:** 아래 코드에서 버그를 찾아 수정하세요.
 """
 
             return (
                 state,
-                feedback + f"\n\n**Moving to Problem {next_idx + 1}...**",
+                feedback + f"\n\n**문제 {next_idx + 1}로 이동합니다...**",
                 gr.update(visible=False),
                 "",
-                f"**Progress: Problem {next_idx + 1} / {TOTAL_PROBLEMS}**",
+                f"**진행 상황: 문제 {next_idx + 1} / {TOTAL_PROBLEMS}**",
                 problem_md,
                 next_problem.buggy_code,
                 new_chat,
@@ -272,19 +272,19 @@ def create_app() -> gr.Blocks:
             total_correct = sum(1 for a in session.problem_attempts if a.is_correct)
 
             results = f"""
-### Your Results
+### 실험 결과
 
-| Metric | Value |
-|--------|-------|
-| Problems Solved Correctly | {total_correct} / {TOTAL_PROBLEMS} |
-| Success Rate | {success_rate:.1%} |
-| Average Conversation Turns | {avg_turns:.1f} |
+| 항목 | 값 |
+|------|-----|
+| 정답 문제 수 | {total_correct} / {TOTAL_PROBLEMS} |
+| 정답률 | {success_rate:.1%} |
+| 평균 대화 턴 수 | {avg_turns:.1f} |
 
 ---
 
-**Session ID:** `{session.session_id}`
+**세션 ID:** `{session.session_id}`
 
-Thank you for participating in this experiment!
+실험에 참여해 주셔서 감사합니다!
 """
             return results
 

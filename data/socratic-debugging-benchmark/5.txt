@@ -1,10 +1,10 @@
 <problem>
-Create a function `fibonacci(n:int)` that takes in a parameter `n`, an integer representing the number of terms in the Fibonacci sequence to generate, and returns:
--  'OOPS', if `n` is less than or equal to 0
-- `1`  if `n` is equal to `1`
-- `1` if `n` is equal to `2`
-- Otherwise, return the nth term of the Fibonacci sequence. A Fibonacci sequence is a sequence in which every number is the sum of the previous two numbers in the sequence. Example Fibonacci sequence: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55 ....
-## Example Cases:
+`fibonacci(n:int)` 함수를 작성하세요. 이 함수는 피보나치 수열에서 생성할 항의 개수를 나타내는 정수 `n`을 매개변수로 받아 다음을 반환합니다:
+- `n`이 0 이하인 경우 'OOPS'
+- `n`이 `1`인 경우 `1`
+- `n`이 `2`인 경우 `1`
+- 그 외의 경우, 피보나치 수열의 n번째 항을 반환합니다. 피보나치 수열은 각 숫자가 이전 두 숫자의 합인 수열입니다. 피보나치 수열 예시: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55 ....
+## 예시:
 ```
 fibonacci(-3) => 'OOPS'
 fibonacci(0) => 'OOPS'

@@ -1,20 +1,20 @@
 <problem>
-Implement a function `my_func(valList:List[Tuple[int,int]])->Dict[int,List[int]]` where
-`valList` is a list of `n` tuples where each tuple contains two integers `a,b` `(1<=a,b)`.
-Return a dictionary where the:
-* key: first elements of `valList`
-* value: list containing all the second elements of the tuples in `valList` that have the same first element as the key.
+`my_func(valList:List[Tuple[int,int]])->Dict[int,List[int]]` 함수를 구현하세요.
+`valList`는 두 개의 정수 `a, b`를 포함하는 `n`개의 튜플로 이루어진 리스트입니다 `(1<=a,b)`.
+다음과 같은 딕셔너리를 반환하세요:
+* key: `valList`의 첫 번째 요소들
+* value: 해당 key와 같은 첫 번째 요소를 가진 `valList`의 모든 튜플에서 두 번째 요소들을 담은 리스트
 
 ```py
 my_func([(6, 5),(2, 7),(2, 5),(8, 7),(8, 9),(2, 7)]) => {6: [5], 2: [7, 5, 7], 8: [7, 9]}
 ```
-In the example above:
+위 예시에서:
 
-* Tuples with 6 as the first element are `(6, 5)` so the value for key 6 is `[5]`
-* Tuples with 2 as the first element are `(2, 7)`, `(2, 5)`, and `(2, 7)` so the value for key 2 is `[7, 5, 7]`
-* Tuples with 8 as the first element are `(8, 7)` and `(8, 9)` so the value for key 8 is `[7, 9]`
+* 첫 번째 요소가 6인 튜플은 `(6, 5)`이므로 key 6의 value는 `[5]`
+* 첫 번째 요소가 2인 튜플은 `(2, 7)`, `(2, 5)`, `(2, 7)`이므로 key 2의 value는 `[7, 5, 7]`
+* 첫 번째 요소가 8인 튜플은 `(8, 7)`, `(8, 9)`이므로 key 8의 value는 `[7, 9]`
 
-## Example Cases:
+## 예시:
 ```
 my_func([(1, 1),(2, 2),(3, 3)]) => {1: [1], 2: [2], 3: [3]}
 my_func([(6, 5),(2, 7),(2, 5),(8, 7),(8, 9),(2, 7)]) => {6: [5], 2: [7, 5, 7], 8: [7, 9]}

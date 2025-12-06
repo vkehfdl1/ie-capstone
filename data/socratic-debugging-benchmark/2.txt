@@ -1,12 +1,12 @@
 <problem>
-Write a function `factorial(n:int) -> int` that computes the factorial n! of a natural number n, which is defined mathematically as:
+`factorial(n:int) -> int` 함수를 작성하세요. 이 함수는 자연수 n의 팩토리얼 n!을 계산합니다. 팩토리얼은 수학적으로 다음과 같이 정의됩니다:
 
 $0! = 1$
 $n! = n \times (n - 1)!$
 
-Additionally, if the input integer n is negative the function should return 0.
+추가로, 입력 정수 n이 음수인 경우 함수는 0을 반환해야 합니다.
 
-## Example Cases:
+## 예시:
 ```
 factorial(-1) => 0
 factorial(0) => 1

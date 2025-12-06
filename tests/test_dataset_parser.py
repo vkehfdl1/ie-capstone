@@ -9,6 +9,7 @@ from ie_capstone.dataset.parser import (
     parse_bug_fixes,
     parse_problem_file,
     parse_unit_tests,
+    strip_line_numbers,
 )
 from ie_capstone.models import Problem
 
@@ -37,6 +38,28 @@ class TestExtractTagContent:
         text = "<dialogue>User: <code>print(x)</code></dialogue>"
         result = extract_tag_content(text, "dialogue")
         assert result == "User: <code>print(x)</code>"
+
+
+class TestStripLineNumbers:
+    def test_strip_simple_line_numbers(self):
+        code = "1. def foo():\n2.     return 1"
+        result = strip_line_numbers(code)
+        assert result == "def foo():\n    return 1"
+
+    def test_strip_double_digit_line_numbers(self):
+        code = "10. line ten\n11. line eleven"
+        result = strip_line_numbers(code)
+        assert result == "line ten\nline eleven"
+
+    def test_no_line_numbers(self):
+        code = "def foo():\n    return 1"
+        result = strip_line_numbers(code)
+        assert result == "def foo():\n    return 1"
+
+    def test_preserve_indentation_after_number(self):
+        code = "1. def foo():\n2.  x = 1\n3.   return x"
+        result = strip_line_numbers(code)
+        assert result == "def foo():\n x = 1\n  return x"
 
 
 class TestParseBugFixes:
@@ -91,7 +114,7 @@ class TestParseProblemFile:
     def test_parse_problem_3(self):
         problem = parse_problem_file(DATA_DIR / "3.txt")
         assert problem.id == 3
-        assert "compass" in problem.description.lower()
+        assert "turn_clockwise" in problem.description or "방위" in problem.description
 
     def test_parse_problem_4(self):
         problem = parse_problem_file(DATA_DIR / "4.txt")
@@ -131,3 +154,13 @@ class TestLoadAllProblems:
             assert problem.bug_description
             assert len(problem.expected_fixes) > 0
             assert len(problem.unit_tests) > 0
+
+    def test_buggy_code_has_no_line_numbers(self):
+        problems = load_all_problems()
+        for problem in problems:
+            lines = problem.buggy_code.split("\n")
+            for line in lines:
+                # Line should not start with "1. ", "2. ", etc.
+                import re
+
+                assert not re.match(r"^\d+\.\s", line), f"Line number found: {line}"

@@ -38,12 +38,14 @@ class TestSocraticLM:
     def test_initialization_emotional_persona(self, sample_problem, mock_client):
         slm = SocraticLM(mock_client, "emotional", sample_problem)
         assert slm.persona == "emotional"
-        assert "friendly" in slm.system_prompt.lower() or "emoji" in slm.system_prompt.lower()
+        # Korean: "친근" means friendly, "이모티콘" means emoji
+        assert "친근" in slm.system_prompt or "이모티콘" in slm.system_prompt
 
     def test_get_initial_greeting_neutral(self, sample_problem, mock_client):
         slm = SocraticLM(mock_client, "neutral", sample_problem)
         greeting = slm.get_initial_greeting()
-        assert "student" in greeting.lower() or "observed" in greeting.lower()
+        # Korean greeting should contain formal language
+        assert "문제" in greeting or "설명" in greeting or "코드" in greeting
         assert len(slm.conversation_history) == 1
         assert slm.conversation_history[0].role == "assistant"
 

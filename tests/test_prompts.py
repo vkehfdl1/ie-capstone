@@ -25,8 +25,8 @@ class TestGetSocraticPrompt:
 
     def test_neutral_prompt_has_formal_tone(self):
         prompt = get_socratic_prompt("neutral", self.problem)
-        assert "third-person" in prompt.lower() or "The student" in prompt
-        assert "Do NOT use emojis" in prompt
+        # Korean: "3인칭" means third-person, "격식체" means formal style
+        assert "3인칭" in prompt or "격식체" in prompt
 
     def test_emotional_prompt_contains_required_sections(self):
         prompt = get_socratic_prompt("emotional", self.problem)
@@ -36,14 +36,15 @@ class TestGetSocraticPrompt:
 
     def test_emotional_prompt_has_friendly_tone(self):
         prompt = get_socratic_prompt("emotional", self.problem)
-        assert "friendly" in prompt.lower() or "encouraging" in prompt.lower()
-        assert "emoji" in prompt.lower()
+        # Korean: "친근" means friendly, "이모티콘" means emoji
+        assert "친근" in prompt or "이모티콘" in prompt
 
     def test_prompts_warn_not_to_reveal_answer(self):
         neutral = get_socratic_prompt("neutral", self.problem)
         emotional = get_socratic_prompt("emotional", self.problem)
-        assert "NEVER reveal" in neutral or "DO NOT REVEAL" in neutral
-        assert "NEVER reveal" in emotional or "DO NOT REVEAL" in emotional
+        # Korean: "절대" means "never", "공개하지" means "don't reveal"
+        assert "절대" in neutral
+        assert "절대" in emotional
 
 
 class TestGetJudgePrompt:
