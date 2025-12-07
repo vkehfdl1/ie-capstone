@@ -1,9 +1,9 @@
-"""Parser for the Socratic Debugging Benchmark dataset."""
+"""Parser for the Socratic Debugging Benchmark and TreeInstruct datasets."""
 
 import re
 from pathlib import Path
 
-from ie_capstone.config import DATA_DIR
+from ie_capstone.config import DATA_DIR, TREEINSTRUCT_DATA_DIR
 from ie_capstone.models import Problem
 
 
@@ -146,22 +146,116 @@ def parse_problem_file(file_path: Path) -> Problem:
     )
 
 
-def load_all_problems(data_dir: Path | None = None) -> list[Problem]:
+def extract_treeinstruct_section(text: str, section_name: str) -> str:
     """
-    Load all 6 problems from the data directory.
+    Extract content from TreeInstruct format (section: --- ... ---).
 
     Args:
-        data_dir: Optional path to data directory (defaults to DATA_DIR)
+        text: Full file content
+        section_name: Name of the section (e.g., "problem", "buggy_code")
+
+    Returns:
+        Stripped content between markers, or empty string if not found
+    """
+    pattern = rf"{section_name}: ---\n{section_name}:\n?(.*?)---"
+    match = re.search(pattern, text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return ""
+
+
+def parse_treeinstruct_file(file_path: Path, problem_id: int) -> Problem:
+    """
+    Parse a TreeInstruct format problem file.
+
+    Args:
+        file_path: Path to the .txt file
+        problem_id: ID to assign to this problem
+
+    Returns:
+        Problem object with all extracted fields
+
+    Raises:
+        FileNotFoundError: If file does not exist
+    """
+    if not file_path.exists():
+        raise FileNotFoundError(f"Problem file not found: {file_path}")
+
+    text = file_path.read_text(encoding="utf-8")
+
+    # Extract all sections
+    description = extract_treeinstruct_section(text, "problem")
+    buggy_code_raw = extract_treeinstruct_section(text, "buggy_code")
+    buggy_code = strip_line_numbers(buggy_code_raw)
+    bug_description = extract_treeinstruct_section(text, "bug_desc")
+    bug_fixes_raw = extract_treeinstruct_section(text, "bug_fixes")
+
+    # TreeInstruct doesn't have unit tests, so we leave empty
+    unit_tests: list[str] = []
+
+    return Problem(
+        id=problem_id,
+        description=description,
+        buggy_code=buggy_code,
+        bug_description=bug_description,
+        expected_fixes=parse_bug_fixes(bug_fixes_raw),
+        unit_tests=unit_tests,
+        example_dialogue="",
+    )
+
+
+def load_socratic_problems() -> list[Problem]:
+    """
+    Load problems from Socratic Debugging Benchmark (1.txt, 2.txt, 3.txt).
+
+    Returns:
+        List of Problem objects with IDs 1-3
+    """
+    problems = []
+    for i in range(1, 4):  # 1, 2, 3
+        file_path = DATA_DIR / f"{i}.txt"
+        if file_path.exists():
+            problems.append(parse_problem_file(file_path))
+    return problems
+
+
+def load_treeinstruct_problems() -> list[Problem]:
+    """
+    Load problems from TreeInstruct dataset.
+
+    Returns:
+        List of Problem objects with IDs 4-6
+    """
+    # TreeInstruct files and their assigned IDs
+    treeinstruct_files = [
+        ("9-palindrome-number.py.txt", 4),
+        ("45-jump-game-ii.py.txt", 5),
+        ("463-island-perimeter.py.txt", 6),
+    ]
+
+    problems = []
+    for filename, problem_id in treeinstruct_files:
+        file_path = TREEINSTRUCT_DATA_DIR / filename
+        if file_path.exists():
+            problems.append(parse_treeinstruct_file(file_path, problem_id))
+    return problems
+
+
+def load_all_problems() -> list[Problem]:
+    """
+    Load all 6 problems from both datasets.
 
     Returns:
         List of Problem objects ordered by ID (1-6)
+        - Problems 1-3: Socratic Debugging Benchmark
+        - Problems 4-6: TreeInstruct Dataset
     """
-    if data_dir is None:
-        data_dir = DATA_DIR
-
     problems = []
-    for i in range(1, 7):
-        file_path = data_dir / f"{i}.txt"
-        problems.append(parse_problem_file(file_path))
+
+    # Load from Socratic Debugging Benchmark (IDs 1-3)
+    problems.extend(load_socratic_problems())
+
+    # Load from TreeInstruct Dataset (IDs 4-6)
+    problems.extend(load_treeinstruct_problems())
 
     return sorted(problems, key=lambda p: p.id)

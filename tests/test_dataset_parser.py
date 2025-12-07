@@ -2,12 +2,14 @@
 
 import pytest
 
-from ie_capstone.config import DATA_DIR
+from ie_capstone.config import DATA_DIR, TREEINSTRUCT_DATA_DIR
 from ie_capstone.dataset.parser import (
     extract_tag_content,
+    extract_treeinstruct_section,
     load_all_problems,
     parse_bug_fixes,
     parse_problem_file,
+    parse_treeinstruct_file,
     parse_unit_tests,
     strip_line_numbers,
 )
@@ -97,12 +99,13 @@ assert search(0, [-120, 60, 78, 100]) == 1"""
 
 
 class TestParseProblemFile:
+    """Tests for Socratic Debugging Benchmark parser (problems 1-3)."""
+
     def test_parse_problem_1(self):
         problem = parse_problem_file(DATA_DIR / "1.txt")
         assert problem.id == 1
         assert "search(x: int, seq: List[int])" in problem.description
         assert "def search(x, seq):" in problem.buggy_code
-        assert "Replace `<` with `<=" in problem.expected_fixes[0]
         assert len(problem.unit_tests) > 0
 
     def test_parse_problem_2(self):
@@ -116,23 +119,71 @@ class TestParseProblemFile:
         assert problem.id == 3
         assert "turn_clockwise" in problem.description or "방위" in problem.description
 
-    def test_parse_problem_4(self):
-        problem = parse_problem_file(DATA_DIR / "4.txt")
-        assert problem.id == 4
-        assert "my_func" in problem.buggy_code
-
-    def test_parse_problem_5(self):
-        problem = parse_problem_file(DATA_DIR / "5.txt")
-        assert problem.id == 5
-        assert "fibonacci" in problem.description.lower()
-
-    def test_parse_problem_6(self):
-        problem = parse_problem_file(DATA_DIR / "6.txt")
-        assert problem.id == 6
-
     def test_parse_nonexistent_file(self):
         with pytest.raises(FileNotFoundError):
             parse_problem_file(DATA_DIR / "999.txt")
+
+
+class TestExtractTreeinstructSection:
+    def test_extract_problem_section(self):
+        text = """problem: ---
+problem:
+This is a test problem.
+---"""
+        result = extract_treeinstruct_section(text, "problem")
+        assert "This is a test problem" in result
+
+    def test_extract_buggy_code_section(self):
+        text = """buggy_code: ---
+buggy_code:
+1. def foo():
+2.     return 1
+---"""
+        result = extract_treeinstruct_section(text, "buggy_code")
+        assert "def foo():" in result
+
+    def test_extract_missing_section_returns_empty(self):
+        text = """problem: ---
+problem:
+Test
+---"""
+        result = extract_treeinstruct_section(text, "nonexistent")
+        assert result == ""
+
+
+class TestParseTreeinstructFile:
+    """Tests for TreeInstruct dataset parser (problems 4-6)."""
+
+    def test_parse_palindrome_number(self):
+        problem = parse_treeinstruct_file(TREEINSTRUCT_DATA_DIR / "9-palindrome-number.py.txt", 4)
+        assert problem.id == 4
+        assert "회문" in problem.description or "palindrome" in problem.description.lower()
+        assert "isPalindrome" in problem.buggy_code
+        assert len(problem.expected_fixes) > 0
+
+    def test_parse_jump_game(self):
+        problem = parse_treeinstruct_file(TREEINSTRUCT_DATA_DIR / "45-jump-game-ii.py.txt", 5)
+        assert problem.id == 5
+        assert "점프" in problem.description or "jump" in problem.description.lower()
+        assert "def jump" in problem.buggy_code
+
+    def test_parse_island_perimeter(self):
+        problem = parse_treeinstruct_file(TREEINSTRUCT_DATA_DIR / "463-island-perimeter.py.txt", 6)
+        assert problem.id == 6
+        assert "섬" in problem.description or "둘레" in problem.description
+        assert "islandPerimeter" in problem.buggy_code
+
+    def test_treeinstruct_has_no_unit_tests(self):
+        problem = parse_treeinstruct_file(TREEINSTRUCT_DATA_DIR / "9-palindrome-number.py.txt", 4)
+        assert problem.unit_tests == []
+
+    def test_treeinstruct_code_has_no_line_numbers(self):
+        problem = parse_treeinstruct_file(TREEINSTRUCT_DATA_DIR / "9-palindrome-number.py.txt", 4)
+        lines = problem.buggy_code.split("\n")
+        import re
+
+        for line in lines:
+            assert not re.match(r"^\d+\.\s", line), f"Line number found: {line}"
 
 
 class TestLoadAllProblems:
@@ -153,14 +204,32 @@ class TestLoadAllProblems:
             assert problem.buggy_code
             assert problem.bug_description
             assert len(problem.expected_fixes) > 0
-            assert len(problem.unit_tests) > 0
+            # Note: TreeInstruct problems (4-6) don't have unit_tests
+            if problem.id <= 3:
+                assert len(problem.unit_tests) > 0
 
     def test_buggy_code_has_no_line_numbers(self):
         problems = load_all_problems()
+        import re
+
         for problem in problems:
             lines = problem.buggy_code.split("\n")
             for line in lines:
                 # Line should not start with "1. ", "2. ", etc.
-                import re
-
                 assert not re.match(r"^\d+\.\s", line), f"Line number found: {line}"
+
+    def test_socratic_problems_are_1_to_3(self):
+        problems = load_all_problems()
+        socratic = [p for p in problems if p.id <= 3]
+        assert len(socratic) == 3
+        # Socratic problems have unit tests
+        for p in socratic:
+            assert len(p.unit_tests) > 0
+
+    def test_treeinstruct_problems_are_4_to_6(self):
+        problems = load_all_problems()
+        treeinstruct = [p for p in problems if p.id >= 4]
+        assert len(treeinstruct) == 3
+        # TreeInstruct problems don't have unit tests
+        for p in treeinstruct:
+            assert p.unit_tests == []

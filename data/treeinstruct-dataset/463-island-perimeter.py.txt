@@ -2,20 +2,20 @@
 problem: ---
 problem:
 
-You are given a map in form of a two-dimensional integer grid where 1 represents land and 0 represents water.
-Grid cells are connected horizontally/vertically (not diagonally). The grid is completely surrounded by water,
-and there is exactly one island (i.e., one or more connected land cells).
-The island doesn't have "lakes" (water inside that isn't connected to the water around the island).
-One cell is a square with side length 1. The grid is rectangular, width and height don't exceed 100.
-Determine the perimeter of the island.
+2차원 정수 그리드 형태의 지도가 주어집니다. 1은 땅을, 0은 물을 나타냅니다.
+그리드 셀은 가로/세로로 연결되어 있습니다 (대각선은 아님). 그리드는 완전히 물로 둘러싸여 있으며,
+정확히 하나의 섬이 있습니다 (즉, 하나 이상의 연결된 땅 셀).
+섬에는 "호수"가 없습니다 (섬 주변의 물과 연결되지 않은 내부의 물).
+한 셀은 한 변의 길이가 1인 정사각형입니다. 그리드는 직사각형이며, 너비와 높이는 100을 초과하지 않습니다.
+섬의 둘레를 구하세요.
 
-Example:
-Input:
+예시:
+입력:
 [[0,1,0,0],
  [1,1,1,0],
  [0,1,0,0],
  [1,1,0,0]]
-Output: 16
+출력: 16
 ---
 
 -----------------------------------------------------------------------

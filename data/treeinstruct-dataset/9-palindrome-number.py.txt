@@ -2,23 +2,22 @@
 problem: ---
 problem:
 
-Determine whether an integer is a palindrome. An integer is a palindrome when it reads the same
-backward as forward.
+정수가 회문(palindrome)인지 판별하세요. 정수가 앞에서 읽으나 뒤에서 읽으나 같으면 회문입니다.
 
-Example 1:
-Input: 121
-Output: true
+예시 1:
+입력: 121
+출력: true
 
-Example 2:
-Input: -121
-Output: false
-Explanation: From left to right, it reads -121. From right to left, it becomes 121-.
-Therefore it is not a palindrome.
+예시 2:
+입력: -121
+출력: false
+설명: 왼쪽에서 오른쪽으로 읽으면 -121입니다. 오른쪽에서 왼쪽으로 읽으면 121-이 됩니다.
+따라서 회문이 아닙니다.
 
-Example 3:
-Input: 10
-Output: false
-Explanation: Reads 01 from right to left. Therefore it is not a palindrome.
+예시 3:
+입력: 10
+출력: false
+설명: 오른쪽에서 왼쪽으로 읽으면 01이 됩니다. 따라서 회문이 아닙니다.
 ---
 
 -----------------------------------------------------------------------

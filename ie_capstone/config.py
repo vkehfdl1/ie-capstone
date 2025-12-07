@@ -5,6 +5,7 @@ from pathlib import Path
 # Paths
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "socratic-debugging-benchmark"
+TREEINSTRUCT_DATA_DIR = PROJECT_ROOT / "data" / "treeinstruct-dataset"
 LOGS_DIR = PROJECT_ROOT / "logs" / "sessions"
 
 # Claude API
