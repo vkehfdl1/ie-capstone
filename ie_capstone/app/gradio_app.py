@@ -346,7 +346,7 @@ def main():
     app = create_app()
     app.launch(
         server_name="0.0.0.0",  # noqa: S104
-        server_port=7860,
+        server_port=9860,
         share=False,
     )
 
